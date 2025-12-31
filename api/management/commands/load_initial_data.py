@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from api.models import Service, Portfolio, Testimonial, SiteSettings, JobPosition
+from api.models import Service, Portfolio, Testimonial, SiteSettings, Job
 
 
 class Command(BaseCommand):
@@ -177,12 +177,12 @@ class Command(BaseCommand):
 • Opportunity to learn industry-standard tools and platforms""",
                 "application_email": "hr@growthifyservices.in",
                 "is_featured": True,
-                "is_remote": False,
+                "is_active": True,  # is_remote ki jagah is_active use karenge
             },
         ]
 
         for job_data in jobs_data:
-            job, created = JobPosition.objects.get_or_create(
+            job, created = Job.objects.get_or_create(
                 title=job_data["title"],
                 department=job_data["department"],
                 defaults=job_data
@@ -197,9 +197,9 @@ class Command(BaseCommand):
             {
                 "title": "Digital Marketing Intern",
                 "department": "Marketing",
-                "location": "INDORE",
+                "location": "on-site",  # Model mein 'on-site' choice hai
                 "location_details": "Indore, Madhya Pradesh",
-                "job_type": "INTERNSHIP",
+                "job_type": "internship",  # Model mein 'internship' lowercase hai
                 "experience_required": "Fresher",
                 "required_skills": "Social Media Marketing, Content Creation, SEO Basics, Analytics",
                 "preferred_skills": "Canva, Google Ads, Facebook Ads",
