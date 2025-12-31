@@ -6,5 +6,5 @@ COPY . /app
 
 # ✅ Ye line change karo
 CMD python manage.py migrate && \
-    python manage.py load_initial_data.py && \
+    python manage.py load_initial_data && \
     gunicorn growthify.wsgi:application --bind 0.0.0.0:8000
