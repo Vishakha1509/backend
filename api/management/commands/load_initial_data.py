@@ -232,7 +232,7 @@ class Command(BaseCommand):
         ]
 
         for job_data in jobs_data:
-            job, created = JobPosition.objects.get_or_create(
+            job, created = Job.objects.get_or_create(
                 title=job_data["title"],
                 department=job_data["department"],
                 defaults=job_data
