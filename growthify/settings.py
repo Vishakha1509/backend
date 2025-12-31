@@ -177,13 +177,13 @@ if DEBUG:
 else:
     # 🔹 Production (Vercel frontend)
     CORS_ALLOWED_ORIGINS = [
-        "https://frontend-liard-tau-76.vercel.app/",
+        "https://frontend-liard-tau-76.vercel.app",
     ]
 
 CORS_ALLOW_CREDENTIALS = False  # ✅ safe
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://frontend-liard-tau-76.vercel.app/",
+    "https://frontend-liard-tau-76.vercel.app",
 ]
 
 
