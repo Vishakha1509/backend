@@ -142,7 +142,7 @@ class Command(BaseCommand):
                         f"Created testimonial: {testimonial.client_name}"
                     )
                 )
-                  jobs_data = [
+        jobs_data = [
             {
                 "title": "Digital Marketing Intern",
                 "department": "Marketing",
