@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 "whatsapp_number": "+918989282885",
             },
         )
+        
         if created:
             self.stdout.write(self.style.SUCCESS("Created site settings"))
 
@@ -141,5 +142,54 @@ class Command(BaseCommand):
                         f"Created testimonial: {testimonial.client_name}"
                     )
                 )
+                  jobs_data = [
+            {
+                "title": "Digital Marketing Intern",
+                "department": "Marketing",
+                "location": "INDORE",  # Assuming you have INDORE as a choice in your model
+                "location_details": "Indore, Madhya Pradesh",
+                "job_type": "INTERNSHIP",  # Assuming you have INTERNSHIP as a choice
+                "experience_required": "Fresher",
+                "required_skills": "Social Media Marketing, Content Creation, SEO Basics, Analytics",
+                "preferred_skills": "Canva, Google Ads, Facebook Ads",
+                "description": "Join our dynamic marketing team as a Digital Marketing Intern and gain hands-on experience in social media marketing, content creation, and digital campaigns. This is an excellent opportunity for freshers to kickstart their career in digital marketing.",
+                "responsibilities": """• Assist in creating and managing social media content across various platforms
+• Support the team in executing digital marketing campaigns
+• Conduct market research and competitor analysis
+• Help in creating engaging content for blogs, social media, and email campaigns
+• Monitor and report on social media analytics
+• Learn and implement SEO best practices
+• Assist in managing Google Ads and Facebook Ads campaigns
+• Collaborate with the design team for creative assets""",
+                "qualifications": """• Bachelor's degree in Marketing, Business, or related field (or currently pursuing)
+• Strong interest in digital marketing and social media
+• Good written and verbal communication skills
+• Basic understanding of social media platforms
+• Eagerness to learn and adapt to new tools and technologies
+• Creative thinking and problem-solving abilities
+• Ability to work in a team environment""",
+                "benefits": """• Hands-on experience with real client projects
+• Mentorship from experienced digital marketing professionals
+• Certificate of completion after successful internship
+• Flexible working hours
+• Potential for full-time employment based on performance
+• Opportunity to learn industry-standard tools and platforms""",
+                "application_email": "hr@growthifyservices.in",
+                "is_featured": True,
+                "is_remote": False,
+            },
+        ]
+
+        for job_data in jobs_data:
+            job, created = JobPosition.objects.get_or_create(
+                title=job_data["title"],
+                department=job_data["department"],
+                defaults=job_data
+            )
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(f"Created job position: {job.title}")
+                )
+
 
         self.stdout.write(self.style.SUCCESS("Successfully loaded all initial data!"))
