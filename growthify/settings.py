@@ -177,13 +177,13 @@ if DEBUG:
 else:
     # 🔹 Production (Vercel frontend)
     CORS_ALLOWED_ORIGINS = [
-        "https://ayush.growthifyservices.in/",
+        "https://ayush.growthifyservices.in",
     ]
 
 CORS_ALLOW_CREDENTIALS = False  # ✅ safe
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://ayush.growthifyservices.in/",
+    "https://ayush.growthifyservices.in",
 ]
 
 
