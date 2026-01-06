@@ -7,6 +7,7 @@ import os
 from decouple import config
 import dj_database_url
 
+
 # --------------------------------------------------
 # BASE DIR
 # --------------------------------------------------
@@ -23,7 +24,15 @@ SECRET_KEY = config(
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(",")
+# ---------------------------
+# ALLOWED HOSTS
+# ---------------------------
+if DEBUG:
+    # Local / Docker safe
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+else:
+    # Production
+    ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="ayush.growthifyservices.in").split(",")
 
 
 # --------------------------------------------------
@@ -53,7 +62,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
-    # CORS must be before CommonMiddleware
+    # CORS
     "corsheaders.middleware.CorsMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -172,13 +181,20 @@ REST_FRAMEWORK = {
 
 
 # --------------------------------------------------
-# CORS & CSRF (PRODUCTION SAFE)
+# CORS & CSRF
 # --------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = False
-
-CORS_ALLOWED_ORIGINS = [
-    "https://ayush.growthifyservices.in",
-]
+if DEBUG:
+    # Local / dev
+    CORS_ALLOW_ALL_ORIGINS = True
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+else:
+    # Production
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="https://ayush.growthifyservices.in").split(",")
+    CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="https://ayush.growthifyservices.in").split(",")
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -202,24 +218,28 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ALLOW_CREDENTIALS = False
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://ayush.growthifyservices.in",
-]
-
 
 # --------------------------------------------------
-# EMAIL CONFIG
+# EMAIL CONFIG (LOCAL + PRODUCTION | SMTP SENDGRID)
 # --------------------------------------------------
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+if DEBUG:
+    # Local
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "vishakharathod1509@gmail.com"
+else:
+    # Production SendGrid SMTP
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.sendgrid.net"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = "apikey"  # literally "apikey"
+    EMAIL_HOST_PASSWORD = config("SENDGRID_API_KEY")
+    DEFAULT_FROM_EMAIL = config(
+        "DEFAULT_FROM_EMAIL",
+        default="noreply@growthifyservices.in",
+    )
 
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-
-DEFAULT_FROM_EMAIL = config(
-    "DEFAULT_FROM_EMAIL", default="noreply@growthify.com"
-)
-
+# --------------------------------------------------
+# CONTACT EMAIL
+# --------------------------------------------------
 CONTACT_EMAIL = "support@growthifyservices.in"
