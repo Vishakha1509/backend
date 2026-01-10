@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.conf import settings
+from threading import Thread
 from .models import Service, Portfolio, Testimonial, Contact, SiteSettings, Job
 from .serializers import (
     ServiceSerializer, PortfolioSerializer, TestimonialSerializer,
@@ -49,21 +50,11 @@ class TestimonialViewSet(viewsets.ReadOnlyModelViewSet):
         return context
 
 
-class ContactViewSet(viewsets.ModelViewSet):
-    queryset = Contact.objects.all()
-    serializer_class = ContactSerializer
-    http_method_names = ['post', 'get']
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        
-        # Send email notification to support@growthifyservices.in
-        try:
-            contact_data = serializer.validated_data
-            subject = f"New Contact Form Submission from {contact_data['name']}"
-            message = f"""
+def send_contact_email_async(contact_data):
+    """Send email in background"""
+    try:
+        subject = f"New Contact Form Submission from {contact_data['name']}"
+        message = f"""
 New contact form submission received:
 
 Name: {contact_data['name']}
@@ -75,18 +66,35 @@ Message:
 
 ---
 This is an automated notification from Growthify Contact Form.
-            """
-            
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.CONTACT_EMAIL],
-                fail_silently=False,
-            )
-        except Exception as e:
-            # Log the error but don't fail the request
-            print(f"Error sending email notification: {e}")
+        """
+        
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.CONTACT_EMAIL],
+            fail_silently=True,
+        )
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
+class ContactViewSet(viewsets.ModelViewSet):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    http_method_names = ['post', 'get']
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # Send email in background thread
+        Thread(
+            target=send_contact_email_async,
+            args=(dict(serializer.validated_data),),
+            daemon=True
+        ).start()
         
         headers = self.get_success_headers(serializer.data)
         return Response(
